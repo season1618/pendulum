@@ -2,11 +2,9 @@ module Main (main) where
 
 import qualified Data.Map.Strict as Map
 import Graphics.Gloss
-import Control.Concurrent
--- import Lib
 
 window :: Display
-window = InWindow "Kepler Problem" (640, 480) (100, 100)
+window = InWindow "Pendulum" (640, 480) (100, 100)
 
 data Node = Num Float
           | Var String
@@ -36,7 +34,7 @@ instance Eq Node where
     Sin x == Sin y = x == y
     Cos x == Cos y = x == y
     Tan x == Tan y = x == y
-    x == y = False
+    _ == _ = False
 
 instance Num Node where
     x + y = Add x y
@@ -130,66 +128,71 @@ diff (Sin x) t = diff x t * Cos x
 diff (Cos x) t = Neg (diff x t * Sin x)
 diff (Tan x) t = diff x t / (Cos x /\ 2)
 
-eulerMethod :: (Map.Map String Float) -> (Node, Node, Node, Node) -> (Node, Node) -> IO ()
-eulerMethod state (dq1, dq2, dp1, dp2) (x, y) = do
-    let q1 = state Map.! "q1"
-    let q2 = state Map.! "q2"
-    let p1 = state Map.! "p1"
-    let p2 = state Map.! "p2"
+type Model = Map.Map String Float
 
-    let q1Next = q1 + eval state dq1
-    let q2Next = q2 + eval state dq2
-    let p1Next = p1 + eval state dp1
-    let p2Next = p2 + eval state dp2
+eulerMethod :: (Node, Node, Node, Node) -> Float -> Model -> Model
+eulerMethod (dotq1, dotq2, dotp1, dotp2) dt (state) = do
+    let q1 = state Map.! "q1"
+        q2 = state Map.! "q2"
+        p1 = state Map.! "p1"
+        p2 = state Map.! "p2"
+
+    let q1Next = q1 -- + eval state dotq1 * dt
+        q2Next = q2 + eval state dotq2 * dt
+        p1Next = p1 + eval state dotp1 * dt
+        p2Next = p2 + eval state dotp2 * dt
 
     let stateNext = Map.insert "q1" q1Next . Map.insert "q2" q2Next . Map.insert "p1" p1Next . Map.insert "p2" p2Next $ state
 
-    display window white $ Translate (eval state x) (eval state y) (Circle 3)
-    print (eval state x, eval state y)
-    threadDelay (1000)
+    stateNext
 
-    eulerMethod stateNext (dq1, dq2, dp1, dp2) (x, y)
+draw :: (Node, Node) -> Model -> Picture
+draw (x, y) state = do
+    let xValue = eval state x
+        yValue = eval state y
+    pictures [line [(0, 0), (xValue, yValue)], Translate xValue yValue (thickCircle 3 5)]
 
 main :: IO ()
 main = do
     -- constant
-    let g = Num 9.8
-    let m = Num 1.0
+    let g = Num 40
+        m = Num 1.0
 
     -- generalized coodinate and momentum
     let q1 = Var "q1"
-    let q2 = Var "q2"
-    let p1 = Var "p1"
-    let p2 = Var "p2"
+        q2 = Var "q2"
+        p1 = Var "p1"
+        p2 = Var "p2"
 
     -- coodinate transformation
     let x = q1 * cos q2
-    let y = q1 * sin q2
+        y = q1 * sin q2
 
     let a11 = diff x "q1"
-    let a12 = diff x "q2"
-    let a21 = diff y "q1"
-    let a22 = diff y "q2"
+        a12 = diff x "q2"
+        a21 = diff y "q1"
+        a22 = diff y "q2"
 
     let det = a11 * a22 - a12 * a21
 
     let b11 = a22 / det
-    let b12 = -a12 / det
-    let b21 = -a21 / det
-    let b22 = a11 / det
+        b12 = -a12 / det
+        b21 = -a21 / det
+        b22 = a11 / det
 
     let px = p1 * b11 + p2 * b21
-    let py = p1 * b12 + p2 * b22
+        py = p1 * b12 + p2 * b22
 
     -- Hamiltonian in Cartesian coodinate
     let h = (px /\ 2 + py /\ 2) / (2 * m) + m * g * y
 
     -- Euler method
-    let dt = Num 0.1
-    let dq1 = diff h "p1" * dt
-    let dq2 = diff h "p2" * dt
-    let dp1 = - diff h "q1" * dt
-    let dp2 = - diff h "q2" * dt
+    let dotq1 = diff h "p1"
+        dotq2 = diff h "p2"
+        dotp1 = - diff h "q1"
+        dotp2 = - diff h "q2"
 
-    putStrLn $ show h
-    eulerMethod (Map.fromList [("q1", 1), ("q2", 0), ("p1", 0), ("p2", 0)]) (dq1, dq2, dp1, dp2) (x, y)
+    -- initial model
+    let initModel = Map.fromList [("q1", 150), ("q2", -pi / 3), ("p1", 0), ("p2", 0)]
+
+    simulate window white 24 initModel (draw (x, y)) (\_ -> eulerMethod (dotq1, dotq2, dotp1, dotp2))
