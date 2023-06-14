@@ -1,7 +1,12 @@
 module Main (main) where
 
 import qualified Data.Map.Strict as Map
+import Graphics.Gloss
+import Control.Concurrent
 -- import Lib
+
+window :: Display
+window = InWindow "Kepler Problem" (640, 480) (100, 100)
 
 data Node = Num Float
           | Var String
@@ -125,8 +130,8 @@ diff (Sin x) t = diff x t * Cos x
 diff (Cos x) t = Neg (diff x t * Sin x)
 diff (Tan x) t = diff x t / (Cos x /\ 2)
 
-eulerMethod :: (Map.Map String Float) -> (Node, Node, Node, Node) -> IO ()
-eulerMethod state (dq1, dq2, dp1, dp2) = do
+eulerMethod :: (Map.Map String Float) -> (Node, Node, Node, Node) -> (Node, Node) -> IO ()
+eulerMethod state (dq1, dq2, dp1, dp2) (x, y) = do
     let q1 = state Map.! "q1"
     let q2 = state Map.! "q2"
     let p1 = state Map.! "p1"
@@ -139,7 +144,11 @@ eulerMethod state (dq1, dq2, dp1, dp2) = do
 
     let stateNext = Map.insert "q1" q1Next . Map.insert "q2" q2Next . Map.insert "p1" p1Next . Map.insert "p2" p2Next $ state
 
-    eulerMethod stateNext (dq1, dq2, dp1, dp2)
+    display window white $ Translate (eval state x) (eval state y) (Circle 3)
+    print (eval state x, eval state y)
+    threadDelay (1000)
+
+    eulerMethod stateNext (dq1, dq2, dp1, dp2) (x, y)
 
 main :: IO ()
 main = do
@@ -183,4 +192,4 @@ main = do
     let dp2 = - diff h "q2" * dt
 
     putStrLn $ show h
-    eulerMethod (Map.fromList [("q1", 1), ("q2", 0), ("p1", 0), ("p2", 0)]) (dq1, dq2, dp1, dp2)
+    eulerMethod (Map.fromList [("q1", 1), ("q2", 0), ("p1", 0), ("p2", 0)]) (dq1, dq2, dp1, dp2) (x, y)
