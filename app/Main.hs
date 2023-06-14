@@ -54,6 +54,11 @@ instance Show Node where
             Div x y -> "(" ++ show x ++ " / " ++ show y ++ ")"
             Pow x n -> "(" ++ show x ++ " ^ " ++ show n ++ ")"
             Neg x -> "- " ++ show x
+            Exp x -> "exp " ++ show x
+            Log x -> "log " ++ show x
+            Sin x -> "sin " ++ show x
+            Cos x -> "cos " ++ show x
+            Tan x -> "tan " ++ show x
 
 instance Floating Node where
     sin x = Sin x
@@ -149,8 +154,8 @@ main = do
     let p2 = Var "p2"
 
     -- coodinate transformation
-    let x = q1
-    let y = q2
+    let x = q1 * cos q2
+    let y = q1 * sin q2
 
     let a11 = diff x "q1"
     let a12 = diff x "q2"
@@ -165,7 +170,7 @@ main = do
     let b22 = a11 / det
 
     let px = p1 * b11 + p2 * b21
-    let py = p2 * b12 + p2 * b22
+    let py = p1 * b12 + p2 * b22
 
     -- Hamiltonian in Cartesian coodinate
     let h = (px /\ 2 + py /\ 2) / (2 * m) + m * g * y
