@@ -128,12 +128,12 @@ diff (Sin x) t = diff x t * Cos x
 diff (Cos x) t = Neg (diff x t * Sin x)
 diff (Tan x) t = diff x t / (Cos x /\ 2)
 
-type Model = Map.Map String Float
+type State = Map.Map String Float
 
-eulerMethod :: (Map.Map String Node) -> Float -> Model -> Model
+eulerMethod :: (Map.Map String Node) -> Float -> State -> State
 eulerMethod pdvs dt state = Map.mapWithKey (\name -> \u -> u + eval state (pdvs Map.! name) * dt) state
 
-draw :: (Node, Node) -> Model -> Picture
+draw :: (Node, Node) -> State -> Picture
 draw (x, y) state = do
     let xValue = eval state x
         yValue = eval state y
@@ -179,8 +179,8 @@ main = do
         dotp = - diff h "r"
         dotl = - diff h "th"
 
-    -- initial model
-    let initModel = Map.fromList [("r", 150), ("th", -pi / 3), ("p", 0), ("l", 0)]
+    -- initial state
+    let initState = Map.fromList [("r", 150), ("th", -pi / 3), ("p", 0), ("l", 0)]
     let pdv = Map.fromList [("r", dotr), ("th", dotth), ("p", dotp), ("l", dotl)]
 
-    simulate window white 24 initModel (draw (x, y)) (\_ -> eulerMethod pdv)
+    simulate window white 24 initState (draw (x, y)) (\_ -> eulerMethod pdv)
