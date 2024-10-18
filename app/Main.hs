@@ -146,19 +146,19 @@ main = do
         m = Num 1.0
 
     -- generalized coodinate and momentum
-    let q1 = Var "q1"
-        q2 = Var "q2"
-        p1 = Var "p1"
-        p2 = Var "p2"
+    let r = Var "r"
+        th = Var "th"
+        p = Var "p"
+        l = Var "l"
 
     -- coodinate transformation
-    let x = q1 * cos q2
-        y = q1 * sin q2
+    let x = r * cos th
+        y = r * sin th
 
-    let a11 = diff x "q1"
-        a12 = diff x "q2"
-        a21 = diff y "q1"
-        a22 = diff y "q2"
+    let a11 = diff x "r"
+        a12 = diff x "th"
+        a21 = diff y "r"
+        a22 = diff y "th"
 
     let det = a11 * a22 - a12 * a21
 
@@ -167,20 +167,20 @@ main = do
         b21 = -a21 / det
         b22 = a11 / det
 
-    let px = p1 * b11 + p2 * b21
-        py = p1 * b12 + p2 * b22
+    let px = p * b11 + l * b21
+        py = p * b12 + l * b22
 
     -- Hamiltonian in Cartesian coodinate
     let h = (px /\ 2 + py /\ 2) / (2 * m) + m * g * y
 
     -- Euler method
-    let dotq1 = diff h "p1"
-        dotq2 = diff h "p2"
-        dotp1 = - diff h "q1"
-        dotp2 = - diff h "q2"
+    let dotr = diff h "p"
+        dotth = diff h "l"
+        dotp = - diff h "r"
+        dotl = - diff h "th"
 
     -- initial model
-    let initModel = Map.fromList [("q1", 150), ("q2", -pi / 3), ("p1", 0), ("p2", 0)]
-    let pdv = Map.fromList [("q1", dotq1), ("q2", dotq2), ("p1", dotp1), ("p2", dotp2)]
+    let initModel = Map.fromList [("r", 150), ("th", -pi / 3), ("p", 0), ("l", 0)]
+    let pdv = Map.fromList [("r", dotr), ("th", dotth), ("p", dotp), ("l", dotl)]
 
     simulate window white 24 initModel (draw (x, y)) (\_ -> eulerMethod pdv)
