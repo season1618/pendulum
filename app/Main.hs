@@ -130,21 +130,8 @@ diff (Tan x) t = diff x t / (Cos x /\ 2)
 
 type Model = Map.Map String Float
 
-eulerMethod :: (Node, Node, Node, Node) -> Float -> Model -> Model
-eulerMethod (dotq1, dotq2, dotp1, dotp2) dt (state) = do
-    let q1 = state Map.! "q1"
-        q2 = state Map.! "q2"
-        p1 = state Map.! "p1"
-        p2 = state Map.! "p2"
-
-    let q1Next = q1 -- + eval state dotq1 * dt
-        q2Next = q2 + eval state dotq2 * dt
-        p1Next = p1 + eval state dotp1 * dt
-        p2Next = p2 + eval state dotp2 * dt
-
-    let stateNext = Map.insert "q1" q1Next . Map.insert "q2" q2Next . Map.insert "p1" p1Next . Map.insert "p2" p2Next $ state
-
-    stateNext
+eulerMethod :: (Map.Map String Node) -> Float -> Model -> Model
+eulerMethod pdvs dt state = Map.mapWithKey (\name -> \u -> u + eval state (pdvs Map.! name) * dt) state
 
 draw :: (Node, Node) -> Model -> Picture
 draw (x, y) state = do
@@ -194,5 +181,6 @@ main = do
 
     -- initial model
     let initModel = Map.fromList [("q1", 150), ("q2", -pi / 3), ("p1", 0), ("p2", 0)]
+    let pdv = Map.fromList [("q1", dotq1), ("q2", dotq2), ("p1", dotp1), ("p2", dotp2)]
 
-    simulate window white 24 initModel (draw (x, y)) (\_ -> eulerMethod (dotq1, dotq2, dotp1, dotp2))
+    simulate window white 24 initModel (draw (x, y)) (\_ -> eulerMethod pdv)
