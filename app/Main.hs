@@ -181,6 +181,6 @@ main = do
 
     -- initial state
     let initState = Map.fromList [("r", 150), ("th", -pi / 3), ("p", 0), ("l", 0)]
-    let pdv = Map.fromList [("r", dotr), ("th", dotth), ("p", dotp), ("l", dotl)]
+    let pdv = Map.fromList [("r", Num 0), ("th", dotth), ("p", dotp), ("l", dotl)]
 
     simulate window white 24 initState (draw (x, y)) (\_ -> eulerMethod pdv)
