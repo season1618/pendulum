@@ -33,9 +33,11 @@ library
       src
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
-      base >=4.7 && <5
+      ad
+    , base >=4.7 && <5
     , containers
     , gloss
+    , reflection
   default-language: Haskell2010
 
 executable pendulum-exe
@@ -46,10 +48,12 @@ executable pendulum-exe
       app
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      ad
+    , base >=4.7 && <5
     , containers
     , gloss
     , pendulum
+    , reflection
   default-language: Haskell2010
 
 test-suite pendulum-test
@@ -61,8 +65,10 @@ test-suite pendulum-test
       test
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      ad
+    , base >=4.7 && <5
     , containers
     , gloss
     , pendulum
+    , reflection
   default-language: Haskell2010
