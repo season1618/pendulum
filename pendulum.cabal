@@ -24,8 +24,8 @@ source-repository head
 
 library
   exposed-modules:
+      Hamilton
       Lib
-      Node
       Ode
   other-modules:
       Paths_pendulum
