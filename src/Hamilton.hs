@@ -9,6 +9,14 @@ import Numeric.AD.Mode.Reverse as Rev
 import Numeric.AD.Internal.Reverse
 import Type.Reflection
 
+hamilEq :: Num a => (forall s. (Reifies s Tape, Typeable s) => [Rev.Reverse s a] -> Rev.Reverse s a) -> [a] -> [a]
+hamilEq hamil state = do
+    let dHd_ = grad hamil state -- dH / dq, dH / dp
+    let d_dt = calc dHd_ where
+        calc [] = []
+        calc (dHdq : dHdp : xs) = dHdp : -dHdq : calc xs -- dq / dt = dH / dp, dp / dt = -dH / dq
+    d_dt
+
 jacob2 :: Num a => (forall s. (Reifies s Tape, Typeable s) => (Rev.Reverse s a, Rev.Reverse s a) -> (Rev.Reverse s a, Rev.Reverse s a)) -> (a, a) -> ((a, a), (a, a))
 jacob2 f (x1, x2) = do
     let [[a11, a12], [a21, a22]] = jacobian (\[s1, s2] -> let (t1, t2) = f (s1, s2) in [t1, t2]) [x1, x2]
