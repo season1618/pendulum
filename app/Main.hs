@@ -7,6 +7,13 @@ import Ode
 window :: Display
 window = InWindow "Pendulum" (640, 480) (100, 100)
 
+free :: (Fractional a, Floating a, Num a) => [a] -> a
+free [_, pX, _, pY] = (pX * pX + pY * pY) / (2 * m)
+    where m = 1
+
+point :: [Float] -> Picture
+point [x, _, y, _] = translate x y (circle 5)
+
 draw :: [Float] -> Picture
 draw [r, pR, th, pTh] = do
     let (x, y) = (r * cos th, r * sin th)
@@ -26,4 +33,5 @@ pendulum [r, pR, th, pTh] = do
 
 main :: IO ()
 main = do
+    simulate window white 24 [0, 100, 0, 50] point (\_ -> euler free)
     simulate window white 24 [150, 0, -pi/3, 0] draw (\_ -> euler pendulum)
