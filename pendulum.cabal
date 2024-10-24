@@ -27,6 +27,7 @@ library
       Hamilton
       Lib
       Ode
+      System
   other-modules:
       Paths_pendulum
   hs-source-dirs:
