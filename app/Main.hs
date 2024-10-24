@@ -14,27 +14,20 @@ free [_, pX, _, pY] = (pX * pX + pY * pY) / (2 * m)
 point :: [Float] -> Picture
 point [x, _, y, _] = translate x y (circle 5)
 
-draw :: [Float] -> Picture
-draw [th, pTh] = do
-    let r = 150
-    let (x, y) = (r * cos th, r * sin th)
-    pictures [line [(0, 0), (x, y)], Translate x y (thickCircle 3 5)]
-
-f :: (Fractional a, Floating a, Num a) => (a, a) -> (a, a)
-f (r, th) = (r * cos th, r * sin th)
-
-pendulum :: (Fractional a, Floating a, Num a) => [a] -> a
-pendulum [th, pTh] = do
-    let r = 150
-        pR = 0
+pendulumModel :: (Fractional a, Floating a, Num a) => a -> (a, a) -> [a] -> a
+pendulumModel m (r, pR) [th, pTh] = do
     let g = 40
-        m = 1
-        pF = transPosToTransMom2 f (r, th)
-        (_, y) = f (r, th)
+        pF = transPosToTransMom2 polarToCartesian (r, th)
+        (_, y) = polarToCartesian (r, th)
         (pX, pY) = pF (pR, pTh)
     (pX * pX + pY * pY) / (2 * m) + m * g * y
+
+pendulumView :: (Float, Float) -> [Float] -> Picture
+pendulumView (r, _) [th, _] = do
+    let (x, y) = polarToCartesian (r, th)
+    pictures [line [(0, 0), (x, y)], Translate x y (thickCircle 3 5)]
 
 main :: IO ()
 main = do
     -- simulate window white 24 [0, 100, 0, 50] point (\_ -> euler free)
-    simulate window white 24 [-pi/3, 0] draw (\_ -> euler pendulum)
+    simulate window white 128 [-pi/3, 0] (pendulumView (150, 0)) (\_ -> euler (pendulumModel 1 (150, 0)))

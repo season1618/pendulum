@@ -17,6 +17,9 @@ hamilEq hamil state = do
         calc (dHdq : dHdp : xs) = dHdp : -dHdq : calc xs -- dq / dt = dH / dp, dp / dt = -dH / dq
     d_dt
 
+polarToCartesian :: (Fractional a, Floating a, Num a) => (a, a) -> (a, a)
+polarToCartesian (r, th) = (r * cos th, r * sin th)
+
 jacob2 :: Num a => (forall s. (Reifies s Tape, Typeable s) => (Rev.Reverse s a, Rev.Reverse s a) -> (Rev.Reverse s a, Rev.Reverse s a)) -> (a, a) -> ((a, a), (a, a))
 jacob2 f (x1, x2) = do
     let [[a11, a12], [a21, a22]] = jacobian (\[s1, s2] -> let (t1, t2) = f (s1, s2) in [t1, t2]) [x1, x2]
