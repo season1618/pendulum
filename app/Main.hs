@@ -16,7 +16,7 @@ point [x, _, y, _] = translate x y (circle 5)
 
 pendulumModel :: Floating a => a -> (a, a) -> [a] -> a
 pendulumModel m (r, pR) [th, pTh] = do
-    let g = 40
+    let g = 200
         pF = transPosToTransMom2 polarToCartesian (r, th)
         (_, y) = polarToCartesian (r, th)
         (pX, pY) = pF (pR, pTh)
