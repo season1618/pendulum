@@ -7,14 +7,14 @@ import Ode
 window :: Display
 window = InWindow "Pendulum" (640, 480) (100, 100)
 
-free :: (Fractional a, Floating a, Num a) => [a] -> a
+free :: Fractional a => [a] -> a
 free [_, pX, _, pY] = (pX * pX + pY * pY) / (2 * m)
     where m = 1
 
 point :: [Float] -> Picture
 point [x, _, y, _] = translate x y (circle 5)
 
-pendulumModel :: (Fractional a, Floating a, Num a) => a -> (a, a) -> [a] -> a
+pendulumModel :: Floating a => a -> (a, a) -> [a] -> a
 pendulumModel m (r, pR) [th, pTh] = do
     let g = 40
         pF = transPosToTransMom2 polarToCartesian (r, th)
