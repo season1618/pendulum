@@ -25,3 +25,19 @@ midpoint = rk2 0.5
 
 heun :: ([Float] -> [Float]) -> Float -> [Float] -> [Float]
 heun = rk2 1
+
+-- s_n+1 = s_n + (k_1 + 2k_2 + 2k_3 + k_4) h/6
+-- k_1 = f(s_n)
+-- k_2 = f(s_n + k_1 h/2)
+-- k_3 = f(s_n + k_2 h/2)
+-- k_4 = f(s_n + k_3 h)
+rk4Classical :: ([Float] -> [Float]) -> Float -> [Float] -> [Float]
+rk4Classical f dt s = s .+. ((k1 .+. (2 .* k2) .+. (2 .* k3) .+. k4) *. (dt / 6)) where
+    (.+.) = zipWith (+)
+    (.*) x ys = map (x *) ys
+    (*.) xs y = map (* y) xs
+
+    k1 = f s
+    k2 = f $ s .+. (k1 *. (dt/2))
+    k3 = f $ s .+. (k2 *. (dt/2))
+    k4 = f $ s .+. (k3 *. dt)
