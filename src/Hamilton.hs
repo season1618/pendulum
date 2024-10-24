@@ -17,6 +17,12 @@ hamilEq hamil state = do
         calc (dHdq : dHdp : xs) = dHdp : -dHdq : calc xs -- dq / dt = dH / dp, dp / dt = -dH / dq
     d_dt
 
+solveHamilEq :: Num a
+    => (forall s. (Reifies s Tape, Typeable s) => [Rev.Reverse s a] -> Rev.Reverse s a)
+    -> (([a] -> [a]) -> a -> [a] -> [a])
+    -> a -> [a] -> [a]
+solveHamilEq hamil method = method (hamilEq hamil)
+
 polarToCartesian :: (Fractional a, Floating a, Num a) => (a, a) -> (a, a)
 polarToCartesian (r, th) = (r * cos th, r * sin th)
 

@@ -29,5 +29,4 @@ pendulumView (r, _) [th, _] = do
 
 main :: IO ()
 main = do
-    -- simulate window white 24 [0, 100, 0, 50] point (\_ -> euler free)
-    simulate window white 128 [-pi/3, 0] (pendulumView (150, 0)) (\_ -> euler (pendulumModel 1 (150, 0)))
+    simulate window white 128 [-pi/3, 0] (pendulumView (150, 0)) (\_ -> solveHamilEq (pendulumModel 1 (150, 0)) euler)
