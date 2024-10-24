@@ -15,7 +15,8 @@ point :: [Float] -> Picture
 point [x, _, y, _] = translate x y (circle 5)
 
 draw :: [Float] -> Picture
-draw [r, pR, th, pTh] = do
+draw [th, pTh] = do
+    let r = 150
     let (x, y) = (r * cos th, r * sin th)
     pictures [line [(0, 0), (x, y)], Translate x y (thickCircle 3 5)]
 
@@ -23,7 +24,9 @@ f :: (Fractional a, Floating a, Num a) => (a, a) -> (a, a)
 f (r, th) = (r * cos th, r * sin th)
 
 pendulum :: (Fractional a, Floating a, Num a) => [a] -> a
-pendulum [r, pR, th, pTh] = do
+pendulum [th, pTh] = do
+    let r = 150
+        pR = 0
     let g = 40
         m = 1
         pF = transPosToTransMom2 f (r, th)
@@ -33,5 +36,5 @@ pendulum [r, pR, th, pTh] = do
 
 main :: IO ()
 main = do
-    simulate window white 24 [0, 100, 0, 50] point (\_ -> euler free)
-    simulate window white 24 [150, 0, -pi/3, 0] draw (\_ -> euler pendulum)
+    -- simulate window white 24 [0, 100, 0, 50] point (\_ -> euler free)
+    simulate window white 24 [-pi/3, 0] draw (\_ -> euler pendulum)
