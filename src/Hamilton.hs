@@ -58,6 +58,12 @@ si2 (dqdt, dpdt) dt (q, p) = (q'', p') where
     p'  = p  + map (*  dt   ) (dpdt q')
     q'' = q' + map (* (dt/2)) (dqdt p')
 
+si4 :: Floating a => ([a] -> [a], [a] -> [a]) -> a -> ([a], [a]) -> ([a], [a])
+si4 (dqdt, dpdt) dt = si2' (a * dt) . si2' (b * dt) . si2' (a * dt) where
+    si2' = si2 (dqdt, dpdt)
+    a = 1 / (2 - 2 ** (1/3))
+    b = - 2 ** (1/3) / (2 - 2 ** (1/3))
+
 polarToCartesian :: Floating a => (a, a) -> (a, a)
 polarToCartesian (r, th) = (r * cos th, r * sin th)
 
