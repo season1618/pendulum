@@ -9,6 +9,10 @@ import Numeric.AD.Mode.Reverse as Rev
 import Numeric.AD.Internal.Reverse
 import Type.Reflection
 
+instance Num a => Num [a] where
+    (+) = zipWith (+)
+    (-) = zipWith (-)
+
 hamilEq :: Num a => (forall s. (Reifies s Tape, Typeable s) => [Rev.Reverse s a] -> Rev.Reverse s a) -> [a] -> [a]
 hamilEq hamil state = do
     let dHd_ = grad hamil state -- dH / dq, dH / dp
@@ -22,6 +26,26 @@ solveHamilEq :: Num a
     -> (([a] -> [a]) -> a -> [a] -> [a])
     -> a -> [a] -> [a]
 solveHamilEq hamil method = method (hamilEq hamil)
+
+-- H(p, q) = H_1(p) + H_2(q)
+solveHamilSum1 :: Num a
+    => (forall s. (Reifies s Tape, Typeable s) => [Rev.Reverse s a] -> Rev.Reverse s a)
+    -> (forall s. (Reifies s Tape, Typeable s) => [Rev.Reverse s a] -> Rev.Reverse s a)
+    -> a -> [a] -> [a]
+solveHamilSum1 hamilP hamilQ dt state = do
+    let (q, p) = unzip' state
+    let dHdp = grad hamilP p
+        qNext = q + map (* dt) dHdp -- q_n+1 = q_n + dH/dp(p_n) h
+        dHdq = grad hamilQ qNext
+        pNext = p - map (* dt) dHdq -- p_n+1 = p_n - dH/dq(q_n+1) h
+    zip' (qNext, pNext)
+    where
+        zip' :: ([a], [a]) -> [a]
+        zip' ([], []) = []
+        zip' (x:xs, y:ys) = x : y : zip' (xs, ys)
+        unzip' :: [a] -> ([a], [a])
+        unzip' [] = ([], [])
+        unzip' (x : y : xys) = let (xs, ys) = unzip' xys in (x:xs, y:ys)
 
 polarToCartesian :: Floating a => (a, a) -> (a, a)
 polarToCartesian (r, th) = (r * cos th, r * sin th)
