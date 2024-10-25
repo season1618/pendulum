@@ -49,7 +49,6 @@ loss a b = minimum $ abs (a - b)
 -- s_n+1 = s_n + f((s_n + s_n+1) / 2) h
 midpointImplicit :: ([Float] -> [Float]) -> Float -> [Float] -> [Float]
 midpointImplicit f dt s = iter s where
-    (.*) x ys = map (x *) ys
     (*.) xs y = map (* y) xs
     iter :: [Float] -> [Float]
     iter sNext = do
