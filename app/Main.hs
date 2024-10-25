@@ -41,6 +41,6 @@ pendulumView (r, _) [th, _] = do
 
 main :: IO ()
 main = do
-    simulate (InWindow "Harmonic Oscillator" (640, 480) (100, 100)) white 24 [150, 0] harmOscView (\_ -> solveHamilSum si1 (harmOscKinetic 1) (harmOscPotential 1))
+    simulate (InWindow "Harmonic Oscillator" (640, 480) (100, 100)) white 24 [150, 0] harmOscView (\_ -> solveHamilSum si2 (harmOscKinetic 1) (harmOscPotential 1))
     simulate (InWindow "Harmonic Oscillator" (640, 480) (100, 100)) white 24 [150, 0] harmOscView (\_ -> solveHamilEq (harmOscModel (1, 1)) midpointImplicit)
     simulate window white 128 [-pi/3, 0] (pendulumView (150, 0)) (\_ -> solveHamilEq (pendulumModel 1 (150, 0)) midpointImplicit)

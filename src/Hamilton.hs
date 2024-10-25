@@ -52,6 +52,12 @@ si1 dt (dqdt, dpdt) (q, p) = (q', p') where
     q' = q + map (* dt) (dqdt p)  -- q_n+1 = q_n + dq/dt(p_n  ) h
     p' = p + map (* dt) (dpdt q') -- p_n+1 = p_n + dp/dt(q_n+1) h
 
+si2 :: Fractional a => a -> ([a] -> [a], [a] -> [a]) -> ([a], [a]) -> ([a], [a])
+si2 dt (dqdt, dpdt) (q, p) = (q'', p') where
+    q'  = q  + map (* (dt/2)) (dqdt p )
+    p'  = p  + map (*  dt   ) (dpdt q')
+    q'' = q' + map (* (dt/2)) (dqdt p')
+
 polarToCartesian :: Floating a => (a, a) -> (a, a)
 polarToCartesian (r, th) = (r * cos th, r * sin th)
 
