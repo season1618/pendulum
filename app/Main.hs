@@ -14,6 +14,12 @@ free [_, pX, _, pY] = (pX * pX + pY * pY) / (2 * m)
 point :: [Float] -> Picture
 point [x, _, y, _] = translate x y (circle 5)
 
+harmOscModel :: Floating a => (a, a) -> [a] -> a
+harmOscModel (m, k) [x, p] = p * p / (2 * m) + k * x * x / 2
+
+harmOscView :: [Float] -> Picture
+harmOscView [x, p] = pictures [circle 150, translate x p (circleSolid 5)]
+
 pendulumModel :: Floating a => a -> (a, a) -> [a] -> a
 pendulumModel m (r, pR) [th, pTh] = do
     let g = 200
@@ -29,4 +35,5 @@ pendulumView (r, _) [th, _] = do
 
 main :: IO ()
 main = do
+    simulate (InWindow "Harmonic Oscillator" (640, 480) (100, 100)) white 24 [150, 0] harmOscView (\_ -> solveHamilEq (harmOscModel (1, 1)) midpointImplicit)
     simulate window white 128 [-pi/3, 0] (pendulumView (150, 0)) (\_ -> solveHamilEq (pendulumModel 1 (150, 0)) midpointImplicit)
