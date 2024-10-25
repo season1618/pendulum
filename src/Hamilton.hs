@@ -29,7 +29,7 @@ solveHamilEq hamil method = method (hamilEq hamil)
 
 -- H(p, q) = H_1(p) + H_2(q)
 solveHamilSum :: Num a
-    => (a -> ([a] -> [a], [a] -> [a]) -> ([a], [a]) -> ([a], [a]))
+    => (([a] -> [a], [a] -> [a]) -> a -> ([a], [a]) -> ([a], [a]))
     -> (forall s. (Reifies s Tape, Typeable s) => [Rev.Reverse s a] -> Rev.Reverse s a)
     -> (forall s. (Reifies s Tape, Typeable s) => [Rev.Reverse s a] -> Rev.Reverse s a)
     -> a -> [a] -> [a]
@@ -37,7 +37,7 @@ solveHamilSum method hamilP hamilQ dt state = do
     let (q, p) = unzip' state
         dqdt = grad hamilP
         dpdt = map negate . grad hamilQ
-        (q', p') = method dt (dqdt, dpdt) (q, p)
+        (q', p') = method (dqdt, dpdt) dt (q, p)
     zip' (q', p')
     where
         zip' :: ([a], [a]) -> [a]
@@ -47,13 +47,13 @@ solveHamilSum method hamilP hamilQ dt state = do
         unzip' [] = ([], [])
         unzip' (x : y : xys) = let (xs, ys) = unzip' xys in (x:xs, y:ys)
 
-si1 :: Num a => a -> ([a] -> [a], [a] -> [a]) -> ([a], [a]) -> ([a], [a])
-si1 dt (dqdt, dpdt) (q, p) = (q', p') where
-    q' = q + map (* dt) (dqdt p)  -- q_n+1 = q_n + dq/dt(p_n  ) h
-    p' = p + map (* dt) (dpdt q') -- p_n+1 = p_n + dp/dt(q_n+1) h
+si1 :: Num a => ([a] -> [a], [a] -> [a]) -> a -> ([a], [a]) -> ([a], [a])
+si1 (dqdt, dpdt) dt (q, p) = (q', p') where
+    q' = q + map (* dt) (dqdt p )
+    p' = p + map (* dt) (dpdt q')
 
-si2 :: Fractional a => a -> ([a] -> [a], [a] -> [a]) -> ([a], [a]) -> ([a], [a])
-si2 dt (dqdt, dpdt) (q, p) = (q'', p') where
+si2 :: Fractional a => ([a] -> [a], [a] -> [a]) -> a -> ([a], [a]) -> ([a], [a])
+si2 (dqdt, dpdt) dt (q, p) = (q'', p') where
     q'  = q  + map (* (dt/2)) (dqdt p )
     p'  = p  + map (*  dt   ) (dpdt q')
     q'' = q' + map (* (dt/2)) (dqdt p')
