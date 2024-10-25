@@ -28,17 +28,17 @@ solveHamilEq :: Num a
 solveHamilEq hamil method = method (hamilEq hamil)
 
 -- H(p, q) = H_1(p) + H_2(q)
-solveHamilSum1 :: Num a
-    => (forall s. (Reifies s Tape, Typeable s) => [Rev.Reverse s a] -> Rev.Reverse s a)
+solveHamilSum :: Num a
+    => (a -> ([a] -> [a], [a] -> [a]) -> ([a], [a]) -> ([a], [a]))
+    -> (forall s. (Reifies s Tape, Typeable s) => [Rev.Reverse s a] -> Rev.Reverse s a)
     -> (forall s. (Reifies s Tape, Typeable s) => [Rev.Reverse s a] -> Rev.Reverse s a)
     -> a -> [a] -> [a]
-solveHamilSum1 hamilP hamilQ dt state = do
+solveHamilSum method hamilP hamilQ dt state = do
     let (q, p) = unzip' state
-    let dHdp = grad hamilP p
-        qNext = q + map (* dt) dHdp -- q_n+1 = q_n + dH/dp(p_n) h
-        dHdq = grad hamilQ qNext
-        pNext = p - map (* dt) dHdq -- p_n+1 = p_n - dH/dq(q_n+1) h
-    zip' (qNext, pNext)
+        dqdt = grad hamilP
+        dpdt = map negate . grad hamilQ
+        (q', p') = method dt (dqdt, dpdt) (q, p)
+    zip' (q', p')
     where
         zip' :: ([a], [a]) -> [a]
         zip' ([], []) = []
@@ -46,6 +46,11 @@ solveHamilSum1 hamilP hamilQ dt state = do
         unzip' :: [a] -> ([a], [a])
         unzip' [] = ([], [])
         unzip' (x : y : xys) = let (xs, ys) = unzip' xys in (x:xs, y:ys)
+
+si1 :: Num a => a -> ([a] -> [a], [a] -> [a]) -> ([a], [a]) -> ([a], [a])
+si1 dt (dqdt, dpdt) (q, p) = (q', p') where
+    q' = q + map (* dt) (dqdt p)  -- q_n+1 = q_n + dq/dt(p_n  ) h
+    p' = p + map (* dt) (dpdt q') -- p_n+1 = p_n + dp/dt(q_n+1) h
 
 polarToCartesian :: Floating a => (a, a) -> (a, a)
 polarToCartesian (r, th) = (r * cos th, r * sin th)
