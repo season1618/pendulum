@@ -41,3 +41,17 @@ rk4Classical f dt s = s .+. ((k1 .+. (2 .* k2) .+. (2 .* k3) .+. k4) *. (dt / 6)
     k2 = f $ s .+. (k1 *. (dt/2))
     k3 = f $ s .+. (k2 *. (dt/2))
     k4 = f $ s .+. (k3 *. dt)
+
+loss :: [Float] -> [Float] -> Float
+loss a b = minimum $ map abs (zipWith (-) a b)
+
+-- s_n+1 = s_n + f((s_n + s_n+1) / 2) h
+midpointImplicit :: ([Float] -> [Float]) -> Float -> [Float] -> [Float]
+midpointImplicit f dt s = iter s where
+    (.+.) = zipWith (+)
+    (.*) x ys = map (x *) ys
+    (*.) xs y = map (* y) xs
+    iter :: [Float] -> [Float]
+    iter sNext = do
+        let sNext' = s .+. (f ((s .+. sNext) *. 0.5) *. dt)
+        if loss sNext sNext' <= 1e-6 then sNext' else iter sNext'
