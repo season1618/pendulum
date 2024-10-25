@@ -7,20 +7,19 @@ cabal-version: 1.12
 name:           pendulum
 version:        0.1.0.0
 description:    Please see the README on GitHub at <https://github.com/githubuser/pendulum#readme>
-homepage:       https://github.com/githubuser/pendulum#readme
-bug-reports:    https://github.com/githubuser/pendulum/issues
-author:         Author name here
+homepage:       https://github.com/season1618/pendulum#readme
+bug-reports:    https://github.com/season1618/pendulum/issues
+author:         season1618
 maintainer:     example@example.com
 copyright:      2023 Author name here
 license:        BSD3
 build-type:     Simple
 extra-source-files:
     README.md
-    CHANGELOG.md
 
 source-repository head
   type: git
-  location: https://github.com/githubuser/pendulum
+  location: https://github.com/season1618/pendulum
 
 library
   exposed-modules:

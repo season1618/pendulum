@@ -1,14 +1,13 @@
 name:                pendulum
 version:             0.1.0.0
-github:              "githubuser/pendulum"
+github:              "season1618/pendulum"
 license:             BSD3
-author:              "Author name here"
+author:              "season1618"
 maintainer:          "example@example.com"
 copyright:           "2023 Author name here"
 
 extra-source-files:
 - README.md
-- CHANGELOG.md
 
 # Metadata used when publishing your package
 # synopsis:            Short description of your package
