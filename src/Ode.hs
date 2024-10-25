@@ -15,7 +15,7 @@ euler :: Num a => ([a] -> [a]) -> a -> [a] -> [a]
 euler = rk1
 
 -- s_n+1 = s_n + { (1-1/2a) f(s_n) + 1/2a f(s_n + af(s_n)h) } h
-rk2 :: Float -> ([Float] -> [Float]) -> Float -> [Float] -> [Float] -- Floating a => a -> ([a] -> [a]) -> a -> [a] -> [a]
+rk2 :: Float -> ([Float] -> [Float]) -> Float -> [Float] -> [Float]
 rk2 a f dt s = do
     let (.*) x ys = map (x *) ys
     let (*.) xs y = map (* y) xs
